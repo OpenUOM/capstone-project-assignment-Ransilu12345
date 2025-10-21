@@ -25,7 +25,7 @@ export class TeacherTableComponent implements OnInit {
     this.router.navigate(['addTeacher'])
   }
 
-  editTeacher(id) {
+  editTeacher(id: any) {
     const navigationExtras: NavigationExtras = {
       state: {
         id: id
@@ -44,7 +44,7 @@ export class TeacherTableComponent implements OnInit {
 
   getTeacherData() {
     this.selected = 'Teachers';
-    this.service.getTeacherData().subscribe((response) => {
+    this.service.getTeacherData().subscribe((response: any) => {
       this.teacherData = Object.keys(response).map((key) => [response[key]]);
     }, (error) => {
       console.log('ERROR - ', error)
@@ -60,21 +60,18 @@ export class TeacherTableComponent implements OnInit {
     })
   }
 
-  search(value) {
-    let foundItems = [];
-    if (value.length <= 0) {
+  search(value: string): void {
+    if (value.trim().length === 0) {
       this.getTeacherData();
     } else {
-      let b = this.teacherData.filter((teacher) => {
-        if (teacher[0].name.toLowerCase().indexOf(value) > -1) {
-          foundItems.push(teacher)
-        }
-      });
-      this.teacherData = foundItems;
+      this.teacherData = this.teacherData.filter((teacher: any) => 
+        teacher.name.toLowerCase().includes(value.toLowerCase())
+      );
     }
   }
 
-  deleteTeacher(itemid) {
+
+  deleteTeacher(itemid: any) {
     const test = {
       id: itemid
     }

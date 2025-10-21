@@ -14,7 +14,7 @@ export class AddNewStudentComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  createStudent(value){
+  createStudent(value: any){
 
     const student = {
       id : value.id,
@@ -26,7 +26,7 @@ export class AddNewStudentComponent implements OnInit {
 
     this.service.addStudent(student).subscribe((response)=>{
       this.router.navigate(['student'])
-    },(error)=>{
+    },(error: any)=>{
       console.log('ERROR - ', error)
     })
   }
