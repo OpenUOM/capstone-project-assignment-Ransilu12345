@@ -17,19 +17,10 @@ function init(db) {
 }
 
 const knex_db = require("./db-config");
-const testBase = require("./testBase");
 
 const dbinitialize = async () => {
-  try {
-    await testBase.resetDatabase(knex_db);
-    console.log("Database reset successfully");
-    return { status: "Database initialized successfully" };
-  } catch (error) {
-    console.error("Error initializing database:", error);
-    throw error;
-  }
-};
-
+    testBase.resetDatabase(knex_db);
+}
 
 const readTeachers = async () => {
     const sql = `SELECT * FROM teacher`
