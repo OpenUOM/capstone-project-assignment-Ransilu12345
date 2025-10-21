@@ -12,8 +12,8 @@ export class TeacherTableComponent implements OnInit {
   faTrash = faTrash;
   faPlus = faPlus;
   faPenSquare = faPenSquare;
-  teacherData: any;
-  selected: any;
+  data: any;
+  selected: string = 'Teachers';
 
   constructor(private service: AppServiceService, private router: Router) { }
 
@@ -27,15 +27,13 @@ export class TeacherTableComponent implements OnInit {
 
   editTeacher(id: any) {
     const navigationExtras: NavigationExtras = {
-      state: {
-        id: id
-      }
+      state: { id }
     };
     this.router.navigate(['editTeacher'], navigationExtras)
   }
 
-  initializeDB(){
-    this.service.initializeDB().subscribe((response) => {
+  initializeDB() {
+    this.service.initializeDB().subscribe(() => {
       console.log('DB is Initialized')
     }, (error) => {
       console.log('ERROR - ', error)
@@ -45,7 +43,7 @@ export class TeacherTableComponent implements OnInit {
   getTeacherData() {
     this.selected = 'Teachers';
     this.service.getTeacherData().subscribe((response: any) => {
-      this.teacherData = Object.keys(response).map((key) => [response[key]]);
+      this.data = Object.values(response);
     }, (error) => {
       console.log('ERROR - ', error)
     })
@@ -53,8 +51,8 @@ export class TeacherTableComponent implements OnInit {
 
   getStudentData() {
     this.selected = 'Students';
-    this.service.getStudentData().subscribe((response) => {
-      this.teacherData = response;
+    this.service.getStudentData().subscribe((response: any) => {
+      this.data = Object.values(response);
     }, (error) => {
       console.log('ERROR - ', error)
     })
@@ -62,21 +60,21 @@ export class TeacherTableComponent implements OnInit {
 
   search(value: string): void {
     if (value.trim().length === 0) {
-      this.getTeacherData();
+      if (this.selected === 'Teachers') {
+        this.getTeacherData();
+      } else if (this.selected === 'Students') {
+        this.getStudentData();
+      }
     } else {
-      this.teacherData = this.teacherData.filter((teacher: any) => 
-        teacher.name.toLowerCase().includes(value.toLowerCase())
+      this.data = this.data.filter((item: any) =>
+        item.name.toLowerCase().includes(value.toLowerCase())
       );
     }
   }
 
-
-  deleteTeacher(itemid: any) {
-    const test = {
-      id: itemid
-    }
-    this.service.deleteTeacher(test).subscribe((response) => {
-      this.getTeacherData()
+  deleteTeacher(id: any) {
+    this.service.deleteTeacher({ id }).subscribe(() => {
+      this.getTeacherData();
     })
   }
 }
