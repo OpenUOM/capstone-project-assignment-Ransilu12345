@@ -62,8 +62,6 @@ export class TeacherTableComponent implements OnInit {
     if (value.trim().length === 0) {
       if (this.selected === 'Teachers') {
         this.getTeacherData();
-      } else if (this.selected === 'Students') {
-        this.getStudentData();
       }
     } else {
       this.data = this.data.filter((item: any) =>

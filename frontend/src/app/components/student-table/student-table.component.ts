@@ -49,7 +49,9 @@ export class StudentTableComponent implements OnInit {
 
   search(value: string): void {
     if (value.trim().length === 0) {
-      this.getStudentData();
+      if (this.selected === 'Students') {
+        this.getStudentData();
+      }
     } else {
       this.studentData = this.studentData.filter((student: any) =>
         student.name.toLowerCase().includes(value.toLowerCase())
