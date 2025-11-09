@@ -14,7 +14,8 @@ export class StudentTableComponent implements OnInit {
   faPlus = faPlus;
   faPenSquare = faPenSquare;
   studentData: any;
-  selected: any;
+  allStudentData: any;
+  selected: string = 'Students';
 
   constructor(private service: AppServiceService, private router: Router) { }
 
@@ -36,6 +37,7 @@ export class StudentTableComponent implements OnInit {
   getStudentData() {
     this.service.getStudentData().subscribe((response: any) => {
       this.studentData = Object.values(response);
+      this.allStudentData = Object.values(response);
     }, (error) => {
       console.log('ERROR - ', error);
     })
@@ -49,12 +51,10 @@ export class StudentTableComponent implements OnInit {
 
   search(value: string): void {
     if (value.trim().length === 0) {
-      if (this.selected === 'Students') {
-        this.getStudentData();
-      }
+      this.studentData = this.allStudentData;
     } else {
-      this.studentData = this.studentData.filter((student: any) =>
-        student.name.toLowerCase().includes(value.toLowerCase())
+      this.studentData = this.allStudentData.filter((student: any) =>
+        student[0].name.toLowerCase().includes(value.toLowerCase())
       );
     }
   }

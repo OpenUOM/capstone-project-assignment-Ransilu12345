@@ -13,6 +13,8 @@ export class TeacherTableComponent implements OnInit {
   faPlus = faPlus;
   faPenSquare = faPenSquare;
   data: any;
+  teacherData: any;
+  allTeacherData: any;
   selected: string = 'Teachers';
 
   constructor(private service: AppServiceService, private router: Router) { }
@@ -44,6 +46,8 @@ export class TeacherTableComponent implements OnInit {
     this.selected = 'Teachers';
     this.service.getTeacherData().subscribe((response: any) => {
       this.data = Object.values(response);
+      this.teacherData = Object.values(response);
+      this.allTeacherData = Object.values(response);
     }, (error) => {
       console.log('ERROR - ', error)
     })
@@ -60,12 +64,10 @@ export class TeacherTableComponent implements OnInit {
 
   search(value: string): void {
     if (value.trim().length === 0) {
-      if (this.selected === 'Teachers') {
-        this.getTeacherData();
-      }
+      this.teacherData = this.allTeacherData;
     } else {
-      this.data = this.data.filter((item: any) =>
-        item.name.toLowerCase().includes(value.toLowerCase())
+      this.teacherData = this.allTeacherData.filter((item: any) =>
+        item[0].name.toLowerCase().includes(value.toLowerCase())
       );
     }
   }
