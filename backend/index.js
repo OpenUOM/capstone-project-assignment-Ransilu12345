@@ -1,4 +1,4 @@
-import server from "./server.js";
+const server  = require ("./server.js");
 
 if(process.env.NODE_ENV === "test"){
   server.listen(3000, () => {
@@ -7,7 +7,7 @@ if(process.env.NODE_ENV === "test"){
     );
   });
 }else{
-  server.listen(8080, function () {
+  server.listen(8080, () => {
     console.log(
       "Capstone Project Backend is running on http://localhost:8080"
     );

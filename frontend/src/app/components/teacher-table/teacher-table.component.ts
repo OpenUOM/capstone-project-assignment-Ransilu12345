@@ -12,10 +12,8 @@ export class TeacherTableComponent implements OnInit {
   faTrash = faTrash;
   faPlus = faPlus;
   faPenSquare = faPenSquare;
-  data: any;
   teacherData: any;
-  allTeacherData: any;
-  selected: string = 'Teachers';
+  selected: any;
 
   constructor(private service: AppServiceService, private router: Router) { }
 
@@ -27,15 +25,17 @@ export class TeacherTableComponent implements OnInit {
     this.router.navigate(['addTeacher'])
   }
 
-  editTeacher(id: any) {
+  editTeacher(id) {
     const navigationExtras: NavigationExtras = {
-      state: { id }
+      state: {
+        id: id
+      }
     };
     this.router.navigate(['editTeacher'], navigationExtras)
   }
 
-  initializeDB() {
-    this.service.initializeDB().subscribe(() => {
+  initializeDB(){
+    this.service.initializeDB().subscribe((response) => {
       console.log('DB is Initialized')
     }, (error) => {
       console.log('ERROR - ', error)
@@ -44,11 +44,8 @@ export class TeacherTableComponent implements OnInit {
 
   getTeacherData() {
     this.selected = 'Teachers';
-    this.service.getTeacherData().subscribe((response: any) => {
-      const normalized = this.normalizeRecords(response);
-      this.data = normalized;
-      this.teacherData = [...normalized];
-      this.allTeacherData = [...normalized];
+    this.service.getTeacherData().subscribe((response) => {
+      this.teacherData = Object.keys(response).map((key) => [response[key]]);
     }, (error) => {
       console.log('ERROR - ', error)
     })
@@ -56,42 +53,33 @@ export class TeacherTableComponent implements OnInit {
 
   getStudentData() {
     this.selected = 'Students';
-    this.service.getStudentData().subscribe((response: any) => {
-      this.data = this.normalizeRecords(response);
+    this.service.getStudentData().subscribe((response) => {
+      this.teacherData = response;
     }, (error) => {
       console.log('ERROR - ', error)
     })
   }
 
-  search(value: string): void {
-    if (!Array.isArray(this.allTeacherData)) {
-      return;
-    }
-
-    const query = value?.trim().toLowerCase();
-
-    if (!query) {
-      this.teacherData = [...this.allTeacherData];
-      return;
-    }
-
-    this.teacherData = this.allTeacherData.filter((teacherWrapper: any) => {
-      const teacher = Array.isArray(teacherWrapper) ? teacherWrapper[0] : teacherWrapper;
-      const name = (teacher?.name ?? '').toString().toLowerCase();
-      return name.includes(query);
-    });
-  }
-
-  deleteTeacher(id: any) {
-    this.service.deleteTeacher({ id }).subscribe(() => {
+  search(value) {
+    let foundItems = [];
+    if (value.length <= 0) {
       this.getTeacherData();
-    })
+    } else {
+      let b = this.teacherData.filter((teacher) => {
+        if (teacher[0].name.toLowerCase().indexOf(value) > -1) {
+          foundItems.push(teacher)
+        }
+      });
+      this.teacherData = foundItems;
+    }
   }
 
-  private normalizeRecords(response: any): any[] {
-    const values = Array.isArray(response) ? response : Object.values(response);
-    return values
-      .map((entry: any) => Array.isArray(entry) ? entry[0] : entry)
-      .filter((entry: any) => !!entry);
+  deleteTeacher(itemid) {
+    const test = {
+      id: itemid
+    }
+    this.service.deleteTeacher(test).subscribe((response) => {
+      this.getTeacherData()
+    })
   }
 }

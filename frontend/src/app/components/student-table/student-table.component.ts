@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationExtras } from '@angular/router';
+import { Router,NavigationExtras } from '@angular/router';
 import { faTrash, faPlus, faPenSquare } from '@fortawesome/free-solid-svg-icons';
-import { AppServiceService } from '../../app-service.service';
-
+import {AppServiceService} from '../../app-service.service';
 @Component({
   selector: 'app-student-table',
   templateUrl: './student-table.component.html',
@@ -14,65 +13,55 @@ export class StudentTableComponent implements OnInit {
   faPlus = faPlus;
   faPenSquare = faPenSquare;
   studentData: any;
-  allStudentData: any;
-  selected: string = 'Students';
+  selected: any;
 
-  constructor(private service: AppServiceService, private router: Router) { }
+  constructor(private service : AppServiceService, private router: Router) { }
 
   ngOnInit(): void {
     this.getStudentData();
   }
 
-  addNewStudent() {
+  addNewStudent(){
     this.router.navigate(['addStudent'])
   }
 
-  editStudent(id: any) {
+  editStudent(id){
     const navigationExtras: NavigationExtras = {
-      state: { id }
+      state: {
+        id : id
+      }
     };
-    this.router.navigate(['editStudent'], navigationExtras);
+    this.router.navigate(['editStudent'], navigationExtras )
   }
 
-  getStudentData() {
-    this.service.getStudentData().subscribe((response: any) => {
-      const normalized = this.normalizeRecords(response);
-      this.studentData = [...normalized];
-      this.allStudentData = [...normalized];
-    }, (error) => {
-      console.log('ERROR - ', error);
+  getStudentData(){
+    this.service.getStudentData().subscribe((response)=>{
+      this.studentData = Object.keys(response).map((key) => [response[key]]);
+    },(error)=>{
+      console.log('ERROR - ', error)
     })
   }
 
-  deleteStudent(itemid: any) {
-    this.service.deleteStudent({ id: itemid }).subscribe(() => {
+  deleteStudent(itemid){
+    const student = {
+      id: itemid
+    }
+    this.service.deleteStudent(student).subscribe((response)=>{
+      this.getStudentData()
+    })
+  }
+
+  search(value) {
+    let foundItems = [];
+    if (value.length <= 0) {
       this.getStudentData();
-    })
-  }
-
-  search(value: string): void {
-    if (!Array.isArray(this.allStudentData)) {
-      return;
+    } else {
+      let b = this.studentData.filter((student) => {
+        if (student[0].name.toLowerCase().indexOf(value) > -1) {
+          foundItems.push(student)
+        }
+      });
+      this.studentData = foundItems;
     }
-
-    const query = value?.trim().toLowerCase();
-
-    if (!query) {
-      this.studentData = [...this.allStudentData];
-      return;
-    }
-
-    this.studentData = this.allStudentData.filter((studentWrapper: any) => {
-      const student = Array.isArray(studentWrapper) ? studentWrapper[0] : studentWrapper;
-      const name = (student?.name ?? '').toString().toLowerCase();
-      return name.includes(query);
-    });
-  }
-
-  private normalizeRecords(response: any): any[] {
-    const values = Array.isArray(response) ? response : Object.values(response);
-    return values
-      .map((entry: any) => Array.isArray(entry) ? entry[0] : entry)
-      .filter((entry: any) => !!entry);
   }
 }
