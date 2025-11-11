@@ -10,7 +10,27 @@ export class AppServiceService {
   readonly ROOT_URL: string;
 
   constructor(private http: HttpClient) {
-    this.ROOT_URL = environment.apiBaseUrl || '';
+    this.ROOT_URL = this.resolveBaseUrl();
+  }
+
+  private resolveBaseUrl(): string {
+    if (environment.apiBaseUrl) {
+      return environment.apiBaseUrl;
+    }
+
+    if (typeof window !== 'undefined') {
+      const port = window.location.port;
+
+      if (port === '4200') {
+        return '/api';
+      }
+
+      if (port === '4401') {
+        return '/test';
+      }
+    }
+
+    return '';
   }
 
 

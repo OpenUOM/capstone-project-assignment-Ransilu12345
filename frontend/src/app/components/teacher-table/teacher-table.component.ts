@@ -13,8 +13,8 @@ export class TeacherTableComponent implements OnInit {
   faPlus = faPlus;
   faPenSquare = faPenSquare;
   data: any;
-  teacherData: any[] = [];
-  allTeacherData: any[] = [];
+  teacherData: any;
+  allTeacherData: any;
   selected: string = 'Teachers';
 
   constructor(private service: AppServiceService, private router: Router) { }
@@ -45,10 +45,10 @@ export class TeacherTableComponent implements OnInit {
   getTeacherData() {
     this.selected = 'Teachers';
     this.service.getTeacherData().subscribe((response: any) => {
-      const normalizedData = this.normalizeRows(response);
-      this.data = normalizedData;
-      this.teacherData = [...normalizedData];
-      this.allTeacherData = [...normalizedData];
+      const normalized = this.normalizeRecords(response);
+      this.data = normalized;
+      this.teacherData = [...normalized];
+      this.allTeacherData = [...normalized];
     }, (error) => {
       console.log('ERROR - ', error)
     })
@@ -57,22 +57,28 @@ export class TeacherTableComponent implements OnInit {
   getStudentData() {
     this.selected = 'Students';
     this.service.getStudentData().subscribe((response: any) => {
-      this.data = Object.values(response);
+      this.data = this.normalizeRecords(response);
     }, (error) => {
       console.log('ERROR - ', error)
     })
   }
 
   search(value: string): void {
-    const searchTerm = value.trim().toLowerCase();
-    if (!searchTerm) {
+    if (!Array.isArray(this.allTeacherData)) {
+      return;
+    }
+
+    const query = value?.trim().toLowerCase();
+
+    if (!query) {
       this.teacherData = [...this.allTeacherData];
       return;
     }
 
-    this.teacherData = this.allTeacherData.filter((teacher: any) => {
-      const name = (teacher && teacher.name) ? teacher.name.toLowerCase() : '';
-      return name.includes(searchTerm);
+    this.teacherData = this.allTeacherData.filter((teacherWrapper: any) => {
+      const teacher = Array.isArray(teacherWrapper) ? teacherWrapper[0] : teacherWrapper;
+      const name = (teacher?.name ?? '').toString().toLowerCase();
+      return name.includes(query);
     });
   }
 
@@ -82,10 +88,10 @@ export class TeacherTableComponent implements OnInit {
     })
   }
 
-  private normalizeRows(response: any): any[] {
-    const values = Array.isArray(response) ? response : Object.values(response || {});
+  private normalizeRecords(response: any): any[] {
+    const values = Array.isArray(response) ? response : Object.values(response);
     return values
-      .map((item: any) => Array.isArray(item) ? item[0] : item)
-      .filter((item: any) => item);
+      .map((entry: any) => Array.isArray(entry) ? entry[0] : entry)
+      .filter((entry: any) => !!entry);
   }
 }
