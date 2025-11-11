@@ -13,8 +13,8 @@ export class StudentTableComponent implements OnInit {
   faTrash = faTrash;
   faPlus = faPlus;
   faPenSquare = faPenSquare;
-  studentData: any;
-  allStudentData: any;
+  studentData: any[] = [];
+  allStudentData: any[] = [];
   selected: string = 'Students';
 
   constructor(private service: AppServiceService, private router: Router) { }
@@ -36,8 +36,9 @@ export class StudentTableComponent implements OnInit {
 
   getStudentData() {
     this.service.getStudentData().subscribe((response: any) => {
-      this.studentData = Object.values(response);
-      this.allStudentData = Object.values(response);
+      const normalizedData = this.normalizeRows(response);
+      this.studentData = [...normalizedData];
+      this.allStudentData = [...normalizedData];
     }, (error) => {
       console.log('ERROR - ', error);
     })
@@ -50,12 +51,22 @@ export class StudentTableComponent implements OnInit {
   }
 
   search(value: string): void {
-    if (value.trim().length === 0) {
-      this.studentData = this.allStudentData;
-    } else {
-      this.studentData = this.allStudentData.filter((student: any) =>
-        student[0].name.toLowerCase().includes(value.toLowerCase())
-      );
+    const searchTerm = value.trim().toLowerCase();
+    if (!searchTerm) {
+      this.studentData = [...this.allStudentData];
+      return;
     }
+
+    this.studentData = this.allStudentData.filter((student: any) => {
+      const name = (student && student.name) ? student.name.toLowerCase() : '';
+      return name.includes(searchTerm);
+    });
+  }
+
+  private normalizeRows(response: any): any[] {
+    const values = Array.isArray(response) ? response : Object.values(response || {});
+    return values
+      .map((item: any) => Array.isArray(item) ? item[0] : item)
+      .filter((item: any) => item);
   }
 }

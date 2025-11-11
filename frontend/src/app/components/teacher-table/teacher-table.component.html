@@ -15,13 +15,13 @@
       <th style="width: 50px;"></th>
     </tr>
     <tr *ngFor="let teacher of teacherData">
-      <td>{{teacher[0].name}}</td>
-      <td>{{teacher[0].id}}</td>
-      <td>{{2022 - teacher[0].age}}</td>
-      <td id="teacher-edit-{{teacher[0].id}}" (click)="editTeacher(teacher[0].id)" style="text-align: center;">
+      <td>{{teacher.name}}</td>
+      <td>{{teacher.id}}</td>
+      <td>{{2022 - teacher.age}}</td>
+      <td id="teacher-edit-{{teacher.id}}" (click)="editTeacher(teacher.id)" style="text-align: center;">
         <fa-icon class="edit-icon" [icon]="faPenSquare"></fa-icon>
       </td>
-      <td id="teacher-delete-{{teacher[0].id}}" (click)="deleteTeacher(teacher[0].id)"
+      <td id="teacher-delete-{{teacher.id}}" (click)="deleteTeacher(teacher.id)"
         style="text-align: center; color: #FC4F4F;">
         <fa-icon class="trash-icon" [icon]="faTrash"></fa-icon>
       </td>

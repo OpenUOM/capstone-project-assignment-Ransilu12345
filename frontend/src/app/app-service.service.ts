@@ -10,8 +10,8 @@ export class AppServiceService {
   readonly ROOT_URL: string;
 
   constructor(private http: HttpClient) {
-  this.ROOT_URL = environment.production ? '/http://localhost:8080' : '';
-}
+    this.ROOT_URL = environment.apiBaseUrl || '';
+  }
 
 
   initializeDB(){

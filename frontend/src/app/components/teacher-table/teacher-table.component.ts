@@ -13,8 +13,8 @@ export class TeacherTableComponent implements OnInit {
   faPlus = faPlus;
   faPenSquare = faPenSquare;
   data: any;
-  teacherData: any;
-  allTeacherData: any;
+  teacherData: any[] = [];
+  allTeacherData: any[] = [];
   selected: string = 'Teachers';
 
   constructor(private service: AppServiceService, private router: Router) { }
@@ -45,9 +45,10 @@ export class TeacherTableComponent implements OnInit {
   getTeacherData() {
     this.selected = 'Teachers';
     this.service.getTeacherData().subscribe((response: any) => {
-      this.data = Object.values(response);
-      this.teacherData = Object.values(response);
-      this.allTeacherData = Object.values(response);
+      const normalizedData = this.normalizeRows(response);
+      this.data = normalizedData;
+      this.teacherData = [...normalizedData];
+      this.allTeacherData = [...normalizedData];
     }, (error) => {
       console.log('ERROR - ', error)
     })
@@ -63,18 +64,28 @@ export class TeacherTableComponent implements OnInit {
   }
 
   search(value: string): void {
-    if (value.trim().length === 0) {
-      this.teacherData = this.allTeacherData;
-    } else {
-      this.teacherData = this.allTeacherData.filter((item: any) =>
-        item[0].name.toLowerCase().includes(value.toLowerCase())
-      );
+    const searchTerm = value.trim().toLowerCase();
+    if (!searchTerm) {
+      this.teacherData = [...this.allTeacherData];
+      return;
     }
+
+    this.teacherData = this.allTeacherData.filter((teacher: any) => {
+      const name = (teacher && teacher.name) ? teacher.name.toLowerCase() : '';
+      return name.includes(searchTerm);
+    });
   }
 
   deleteTeacher(id: any) {
     this.service.deleteTeacher({ id }).subscribe(() => {
       this.getTeacherData();
     })
+  }
+
+  private normalizeRows(response: any): any[] {
+    const values = Array.isArray(response) ? response : Object.values(response || {});
+    return values
+      .map((item: any) => Array.isArray(item) ? item[0] : item)
+      .filter((item: any) => item);
   }
 }
